@@ -3,6 +3,7 @@ package jm.task.core.jdbc.dao;
 import jm.task.core.jdbc.model.User;
 import jm.task.core.jdbc.util.Util;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
@@ -33,6 +34,7 @@ public class UserDaoHibernateImpl implements UserDao {
                     transaction.rollback();
                 }
                 log.error("Error with creating table - 'user'", e);
+                throw new HibernateException(e);
             }
         }
     }
@@ -42,7 +44,7 @@ public class UserDaoHibernateImpl implements UserDao {
         try (final Session session = Util.getSessionFactory().openSession()) {
             final Transaction transaction = session.beginTransaction();
             try {
-                final String DROP_TABLE = "DROP TABLE IF EXISTS users";
+                final String DROP_TABLE = "DROP TABLE IF EXISTS user";
                 session.createSQLQuery(DROP_TABLE).executeUpdate();
                 transaction.commit();
             } catch (final Exception e) {
@@ -50,6 +52,7 @@ public class UserDaoHibernateImpl implements UserDao {
                     transaction.rollback();
                 }
                 log.error("Error with dropping the table - 'user'", e);
+                throw new HibernateException(e);
             }
         }
     }
@@ -67,6 +70,7 @@ public class UserDaoHibernateImpl implements UserDao {
                     transaction.rollback();
                 }
                 log.error("Error with adding data to the table - 'user'", e);
+                throw new HibernateException(e);
             }
         }
     }
@@ -84,6 +88,7 @@ public class UserDaoHibernateImpl implements UserDao {
                     transaction.rollback();
                 }
                 log.error("Error with deleting a user by index in the table - 'user'", e);
+                throw new HibernateException(e);
             }
         }
     }
@@ -108,6 +113,7 @@ public class UserDaoHibernateImpl implements UserDao {
                     transaction.rollback();
                 }
                 log.error("Error with deleting data from the table - 'user'", e);
+                throw new HibernateException(e);
             }
         }
     }

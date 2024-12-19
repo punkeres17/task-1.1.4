@@ -1,6 +1,5 @@
 package jm.task.core.jdbc.util;
 
-import jm.task.core.jdbc.dao.UserDaoHibernateImpl;
 import jm.task.core.jdbc.model.User;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.SessionFactory;
@@ -8,8 +7,6 @@ import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.cfg.Environment;
 import org.hibernate.service.ServiceRegistry;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -18,7 +15,6 @@ import java.util.Properties;
 @Slf4j
 public final class Util {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(UserDaoHibernateImpl.class);
     private static SessionFactory sessionFactory;
     public static SessionFactory getSessionFactory() {
         if (sessionFactory == null) {
