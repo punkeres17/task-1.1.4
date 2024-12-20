@@ -8,8 +8,6 @@ public class Main {
 
     public static void main(final String[] args) {
 
-        Util.getSessionFactory();
-
         final UserService userServiceHibernate = new UserServiceImpl();
         userServiceHibernate.createUsersTable();
         userServiceHibernate.saveUser("Roman", "Smirnov", (byte) 28);
@@ -20,7 +18,7 @@ public class Main {
         userServiceHibernate.getAllUsers().forEach(System.out::println);
         userServiceHibernate.cleanUsersTable();
         userServiceHibernate.dropUsersTable();
-
+        Util.closeSessionFactory();
 
     }
 }
