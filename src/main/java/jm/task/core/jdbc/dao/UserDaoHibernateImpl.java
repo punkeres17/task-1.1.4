@@ -18,78 +18,75 @@ public class UserDaoHibernateImpl implements UserDao {
     @Override
     public void createUsersTable() {
         try (final Session session = Util.getSessionFactory().openSession()) {
-            final Transaction transaction = session.beginTransaction();
-            try {
-                final String CREATE_TABLE = """
-                        CREATE TABLE IF NOT EXISTS user (
-                        id INT AUTO_INCREMENT PRIMARY KEY, 
-                        name VARCHAR(45) NOT NULL, 
-                        lastname VARCHAR(45) NOT NULL, 
-                        age INT)
-                        """;
-                session.createSQLQuery(CREATE_TABLE).executeUpdate();
-                transaction.commit();
-            } catch (final Exception e) {
-                if (transaction != null) {
-                    transaction.rollback();
-                }
-                log.error("Error with creating table - 'user'", e);
-                throw new HibernateException(e);
-            }
+            final String CREATE_TABLE = """
+                    CREATE TABLE IF NOT EXISTS user (
+                    id INT AUTO_INCREMENT PRIMARY KEY, 
+                    name VARCHAR(45) NOT NULL, 
+                    lastname VARCHAR(45) NOT NULL, 
+                    age INT)
+                    """;
+            session.createSQLQuery(CREATE_TABLE).executeUpdate();
+        } catch (final Exception e) {
+            log.error("Error with creating table - 'user'", e);
+            throw new HibernateException(e);
+        } finally {
+            Util.closeSessionFactory();
         }
     }
 
     @Override
     public void dropUsersTable() {
         try (final Session session = Util.getSessionFactory().openSession()) {
-            final Transaction transaction = session.beginTransaction();
-            try {
-                final String DROP_TABLE = "DROP TABLE IF EXISTS user";
-                session.createSQLQuery(DROP_TABLE).executeUpdate();
-                transaction.commit();
-            } catch (final Exception e) {
-                if (transaction != null) {
-                    transaction.rollback();
-                }
-                log.error("Error with dropping the table - 'user'", e);
-                throw new HibernateException(e);
-            }
+            final String DROP_TABLE = "DROP TABLE IF EXISTS user";
+            session.createSQLQuery(DROP_TABLE).executeUpdate();
+
+        } catch (final Exception e) {
+            log.error("Error with dropping the table - 'user'", e);
+            throw new HibernateException(e);
+        } finally {
+            Util.closeSessionFactory();
         }
     }
 
     @Override
     public void saveUser(final String name, final String lastName, final byte age) {
+        Transaction transaction = null;
         try (final Session session = Util.getSessionFactory().openSession()) {
-            final Transaction transaction = session.beginTransaction();
-            try {
-                final User user = new User(name, lastName, age);
-                session.save(user);
-                transaction.commit();
-            } catch (final Exception e) {
-                if (transaction != null) {
-                    transaction.rollback();
-                }
-                log.error("Error with adding data to the table - 'user'", e);
-                throw new HibernateException(e);
+            transaction = session.beginTransaction();
+
+            final User user = new User(name, lastName, age);
+            session.save(user);
+            transaction.commit();
+        } catch (final Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
             }
+            log.error("Error with adding data to the table - 'user'", e);
+            throw new HibernateException(e);
+        } finally {
+            Util.closeSessionFactory();
         }
     }
 
     @Override
     public void removeUserById(final long id) {
+        Transaction transaction = null;
         try (final Session session = Util.getSessionFactory().openSession()) {
-            final Transaction transaction = session.beginTransaction();
-            try {
-                final User user = session.get(User.class, id);
+
+            transaction = session.beginTransaction();
+            final User user = session.get(User.class, id);
+            if (user != null) {
                 session.delete(user);
                 transaction.commit();
-            } catch (final Exception e) {
-                if (transaction != null) {
-                    transaction.rollback();
-                }
-                log.error("Error with deleting a user by index in the table - 'user'", e);
-                throw new HibernateException(e);
             }
+        } catch (final Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            log.error("Error with deleting a user by index in the table - 'user'", e);
+            throw new HibernateException(e);
+        } finally {
+            Util.closeSessionFactory();
         }
     }
 
@@ -97,24 +94,31 @@ public class UserDaoHibernateImpl implements UserDao {
     public List<User> getAllUsers() {
         try (final Session session = Util.getSessionFactory().openSession()) {
             return session.createQuery("from User", User.class).list();
+        } catch (final Exception e) {
+            log.error("Error getting all users", e);
+            throw new HibernateException(e);
+        } finally {
+            Util.closeSessionFactory();
         }
     }
 
     @Override
     public void cleanUsersTable() {
+        Transaction transaction = null;
         try (final Session session = Util.getSessionFactory().openSession()) {
-            final Transaction transaction = session.beginTransaction();
-            try {
-                final String TRUNCATE_TABLE = "TRUNCATE TABLE user";
-                session.createSQLQuery(TRUNCATE_TABLE).executeUpdate();
-                transaction.commit();
-            } catch (final Exception e) {
-                if (transaction != null) {
-                    transaction.rollback();
-                }
-                log.error("Error with deleting data from the table - 'user'", e);
-                throw new HibernateException(e);
+            transaction = session.beginTransaction();
+            final String TRUNCATE_TABLE = "TRUNCATE TABLE user";
+            session.createSQLQuery(TRUNCATE_TABLE).executeUpdate();
+            transaction.commit();
+        } catch (final Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
             }
+            log.error("Error with deleting data from the table - 'user'", e);
+            throw new HibernateException(e);
+        } finally {
+            Util.closeSessionFactory();
         }
     }
 }
+
